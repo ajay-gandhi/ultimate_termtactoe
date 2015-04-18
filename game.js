@@ -92,6 +92,22 @@ var cursor = blessed.box({
 });
 
 container.append(cursor);
+
+// Box for current turn
+var current_turn = blessed.box({
+  content: 'Turn: o',
+  top: -2,
+  left: -15,
+  width: 11,
+  height: 3,
+  align: 'center',
+  border: {
+    type: 'line',
+    fg: '#777777'
+  }
+});
+
+container.append(current_turn);
 screen.render();
 
 // Quit on Escape, q, or Control-C.
@@ -458,7 +474,8 @@ screen.key('space', function() {
     container.append(played);
     played.setBack();
 
-    o_turn = !o_turn;
+    o_turn = !o_turn; 
+    current_turn.content = 'Turn: ' + ((o_turn) ? 'o' : 'x');
 
     var ended = game.won_board(which);
     var game_over = game.won_game();
@@ -604,9 +621,16 @@ screen.on('keypress', function (ch, key) {
       yes.on('press', function () {
         game = new Board();
         playing = true;
+
+        // Hide form and winner cover
         replay_form.hide();
         over.hide();
         display_replay = false;
+
+        // Change turn to o
+        current_turn.content = 'Turn: o';
+        o_turn = true;
+
         screen.render();
       });
 
@@ -622,6 +646,10 @@ screen.on('keypress', function (ch, key) {
     }
   }
 });
+
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// Random Functions ///////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Converts a character to a large ASCII version.
