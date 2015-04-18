@@ -1,0 +1,30 @@
+{
+  "name": "ultimate_termtactoe",
+  "version": "0.1.0",
+  "description": "Ultimate tic tac toe in the terminal",
+  "main": "game.js",
+  "dependencies": {
+    "blessed": "^0.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node game.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ajay-gandhi/ultimate_termtactoe.git"
+  },
+  "keywords": [
+    "tic",
+    "tac",
+    "toe",
+    "ultimate",
+    "game"
+  ],
+  "author": "Ajay Gandhi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ajay-gandhi/ultimate_termtactoe/issues"
+  },
+  "homepage": "https://github.com/ajay-gandhi/ultimate_termtactoe"
+}
