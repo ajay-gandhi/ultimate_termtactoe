@@ -6,6 +6,7 @@ var Board = require('./board');
 var game = new Board();
 
 var o_turn = true,
+    free = false,
     playing = true,
     over,
     display_replay = false,
@@ -139,7 +140,7 @@ screen.key('down', function() {
         }
       }
 
-      // Move cursor straight to next board
+      // Move cursor straight to next mini board board
       if (t <= 11) {
         cursor.top = 14;
         cursor_position.row = 0;
@@ -164,20 +165,28 @@ screen.key('down', function() {
     } else {
 
       // Regular move
-      if (t == 4 || t == 11) {
+      if (cursor_position.row == 2) {
 
-        // Cursor is moving to a new board
-        cursor_position.board += 3;
-        cursor_position.row = -1;
-        t++;
+        // Can only leave mini board if free == true
+        if (free) {
+          // Cursor is moving to a new mini board
+          cursor_position.board += 3;
+          cursor_position.row = -1;
+          t++;
 
-        // Change bg color of current cover
-        var finished = finished_boards[cursor_position.board];
-        if (finished) {
-          finished.style = {
-            fg: finished.style.fg,
-            bg: '#333333'
+          // Change bg color of current cover
+          var finished = finished_boards[cursor_position.board];
+          if (finished) {
+            finished.style = {
+              fg: finished.style.fg,
+              bg: '#333333'
+            }
           }
+        
+        } else {
+          // Undo below
+          cursor_position.row--;
+          t -= 2;
         }
       }
 
@@ -208,7 +217,7 @@ screen.key('up', function() {
         }
       }
 
-      // Move cursor straight to next
+      // Move cursor straight to next mini board
       if (t >= 7) {
         cursor.top = 4;
         cursor_position.row = 2;
@@ -233,27 +242,28 @@ screen.key('up', function() {
     } else {
   
       // Regular move
-      if (t == 7 || t == 14) {
-        // Reset bg color of cover
-        var finished = finished_boards[cursor_position.board];
-        if (finished) {
-          finished.style = {
-            fg: finished.style.fg,
-            bg: '#000000'
-          }
-        }
+      if (cursor_position.row == 0) {
 
-        // Cursor is moving to a new board
-        cursor_position.board -= 3;
-        cursor_position.row = 3;
-        t--;
+        // Can only leave mini board if free == true
+        if (free) {
 
-        finished = finished_boards[cursor_position.board];
-        if (finished) {
-          finished.style = {
-            fg: finished.style.fg,
-            bg: '#333333'
+          // Cursor is moving to a new mini board
+          cursor_position.board -= 3;
+          cursor_position.row = 3;
+          t--;
+
+          finished = finished_boards[cursor_position.board];
+          if (finished) {
+            finished.style = {
+              fg: finished.style.fg,
+              bg: '#333333'
+            }
           }
+
+        } else {
+          // Undo below
+          cursor_position.row++;
+          t += 2;
         }
       }
 
@@ -284,7 +294,7 @@ screen.key('left', function() {
         }
       }
 
-      // Move cursor straight to next
+      // Move cursor straight to next mini board
       if (l >= 14) {
         cursor.left = 9;
         cursor_position.col = 2;
@@ -310,27 +320,28 @@ screen.key('left', function() {
     } else {
 
       // Regular move
-      if (l == 14 || l == 28) {
-        // Reset bg color of cover
-        var finished = finished_boards[cursor_position.board];
-        if (finished) {
-          finished.style = {
-            fg: finished.style.fg,
-            bg: '#000000'
-          }
-        }
+      if (cursor_position.col == 0) {
 
-        // Cursor is moving to a new board
-        cursor_position.board--;
-        cursor_position.col = 3;
-        l -= 2;
+        // Can only leave mini board if free == true
+        if (free) {
 
-        var finished = finished_boards[cursor_position.board];
-        if (finished) {
-          finished.style = {
-            fg: finished.style.fg,
-            bg: '#333333'
+          // Cursor is moving to a new mini board
+          cursor_position.board--;
+          cursor_position.col = 3;
+          l -= 2;
+
+          var finished = finished_boards[cursor_position.board];
+          if (finished) {
+            finished.style = {
+              fg: finished.style.fg,
+              bg: '#333333'
+            }
           }
+
+        } else {
+          // Undo below
+          cursor_position.col++;
+          l += 4;
         }
       }
 
@@ -361,7 +372,7 @@ screen.key('right', function() {
         }
       }
 
-      // Move cursor straight to next
+      // Move cursor straight to next mini board
       if (l <= 22) {
         cursor.left = 29;
         cursor_position.col = 0;
@@ -387,27 +398,28 @@ screen.key('right', function() {
     } else {
 
       // Regular move
-      if (l == 8 || l == 22) {
-        // Reset bg color of cover
-        var finished = finished_boards[cursor_position.board];
-        if (finished) {
-          finished.style = {
-            fg: finished.style.fg,
-            bg: '#000000'
-          }
-        }
+      if (cursor_position.col == 2) {
 
-        // Cursor is moving to a new board
-        cursor_position.board++;
-        cursor_position.col = -1;
-        l += 2;
+        // Can only leave mini board if free == true
+        if (free) {
 
-        var finished = finished_boards[cursor_position.board];
-        if (finished) {
-          finished.style = {
-            fg: finished.style.fg,
-            bg: '#333333'
+          // Cursor is moving to a new mini board
+          cursor_position.board++;
+          cursor_position.col = -1;
+          l += 2;
+
+          var finished = finished_boards[cursor_position.board];
+          if (finished) {
+            finished.style = {
+              fg: finished.style.fg,
+              bg: '#333333'
+            }
           }
+
+        } else {
+          // Undo below
+          cursor_position.col--;
+          l -= 4;
         }
       }
 
@@ -458,16 +470,19 @@ screen.key('space', function() {
   // Ignore if mini board completed
   if (finished_boards[cursor_position.board] || !playing) return;
 
-  var c = (o_turn) ? 'o' : 'x';
+  free = false;
+  var t = (o_turn) ? 'o' : 'x';
   var which = cursor_position.board;
+  var r = cursor_position.row;
+  var c = cursor_position.col;
 
-  var success = game.make_move(which, cursor_position.row, cursor_position.col, c);
+  var success = game.make_move(which, r, c, t);
 
   // Move was possible, i.e. spot was empty
   if (success) {
     // Add x or o to board
     var played = blessed.box({
-      content: c,
+      content: t,
       top: cursor.top - 2,
       left: cursor.left - 4,
       width: 1,
@@ -478,9 +493,35 @@ screen.key('space', function() {
     additions.push(played);
     played.setBack();
 
-    o_turn = !o_turn; 
+    // Toggle turn
+    o_turn = !o_turn;
     current_turn.content = 'Turn: ' + ((o_turn) ? 'o' : 'x');
 
+    // Un-highlight old box if finished
+    var finished = finished_boards[which];
+    if (finished) {
+      finished.style = {
+        fg: finished.style.fg,
+        bg: '#000000'
+      }
+    }
+
+    // Move cursor to appropriate board
+    cursor_position.board = r * 3 + c;
+    cursor.top  = (7 * r)  + (2 * r);
+    cursor.left = (14 * c) + (4 * c) + 1;
+
+    // Highlight new box if finished
+    var finished = finished_boards[cursor_position.board];
+    if (finished) {
+      finished.style = {
+        fg: finished.style.fg,
+        bg: '#333333'
+      }
+      free = true;
+    }
+
+    // Check if game or mini game over
     var ended = game.won_board(which);
     var game_over = game.won_game();
 
@@ -523,9 +564,14 @@ screen.key('space', function() {
         width: 11,
         height: 5,
         style: {
-          bg: '#333333'
+          bg: '#000000'
         }
       });
+
+      // Highlight if cursor is not leaving
+      if (which == cursor_position.board) {
+        finished.style.bg = '#333333';
+      }
 
       finished.style.fg = color_of(ended);
       finished_boards[which] = finished;
