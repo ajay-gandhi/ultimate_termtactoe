@@ -13,7 +13,7 @@ var o_turn = true,
     replay_form;
 
 // Initial position of the player's cursor
-var cursor_position = {
+var cursor_pos = {
   board: 0,
   row: 0,
   col: 0
@@ -128,11 +128,11 @@ screen.key('down', function() {
 
   // Can't leave board space
   if (t < 18) {
-    if (finished_boards[cursor_position.board]) {
+    if (finished_boards[cursor_pos.board]) {
       // Somewhere in a finished board
 
       // Reset bg color of old cover
-      var finished = finished_boards[cursor_position.board];
+      var finished = finished_boards[cursor_pos.board];
       if (finished) {
         finished.style = {
           fg: finished.style.fg,
@@ -143,18 +143,18 @@ screen.key('down', function() {
       // Move cursor straight to next mini board board
       if (t <= 11) {
         cursor.top = 14;
-        cursor_position.row = 0;
-        cursor_position.board += 3;
+        cursor_pos.row = 0;
+        cursor_pos.board += 3;
 
         if (t <= 4) cursor.top = 7;
 
       } else {
         cursor.top = t + 2;
-        cursor_position.row++;
+        cursor_pos.row++;
       }
 
       // Highlight current cover
-      var finished = finished_boards[cursor_position.board];
+      var finished = finished_boards[cursor_pos.board];
       if (finished) {
         finished.style = {
           fg: finished.style.fg,
@@ -165,17 +165,17 @@ screen.key('down', function() {
     } else {
 
       // Regular move
-      if (cursor_position.row == 2) {
+      if (cursor_pos.row == 2) {
 
         // Can only leave mini board if free == true
         if (free) {
           // Cursor is moving to a new mini board
-          cursor_position.board += 3;
-          cursor_position.row = -1;
+          cursor_pos.board += 3;
+          cursor_pos.row = -1;
           t++;
 
           // Change bg color of current cover
-          var finished = finished_boards[cursor_position.board];
+          var finished = finished_boards[cursor_pos.board];
           if (finished) {
             finished.style = {
               fg: finished.style.fg,
@@ -185,17 +185,20 @@ screen.key('down', function() {
         
         } else {
           // Undo below
-          cursor_position.row--;
+          cursor_pos.row--;
           t -= 2;
         }
       }
 
-      cursor_position.row++;
+      cursor_pos.row++;
       cursor.top = t + 2;
     }
   }
 
-  // console.log(cursor_position.row + ', ' + cursor_position.col);
+  if (!game.playable(cursor_pos.board, cursor_pos.row, cursor_pos.col))
+    cursor.style.fg = 'red';
+
+  // console.log(cursor_pos.row + ', ' + cursor_pos.col);
   screen.render();
 });
 
@@ -205,11 +208,11 @@ screen.key('up', function() {
 
   // Can't leave board space
   if (t > 0) {
-    if (finished_boards[cursor_position.board]) {
+    if (finished_boards[cursor_pos.board]) {
       // Somewhere in a finished board
 
       // Reset bg color of old cover
-      var finished = finished_boards[cursor_position.board];
+      var finished = finished_boards[cursor_pos.board];
       if (finished) {
         finished.style = {
           fg: finished.style.fg,
@@ -220,18 +223,18 @@ screen.key('up', function() {
       // Move cursor straight to next mini board
       if (t >= 7) {
         cursor.top = 4;
-        cursor_position.row = 2;
-        cursor_position.board -= 3;
+        cursor_pos.row = 2;
+        cursor_pos.board -= 3;
 
         if (t >= 14) cursor.top = 11;
 
       } else {
         cursor.top = t - 2;
-        cursor_position.row--;
+        cursor_pos.row--;
       }
 
       // Highlight current cover
-      var finished = finished_boards[cursor_position.board];
+      var finished = finished_boards[cursor_pos.board];
       if (finished) {
         finished.style = {
           fg: finished.style.fg,
@@ -242,17 +245,17 @@ screen.key('up', function() {
     } else {
   
       // Regular move
-      if (cursor_position.row == 0) {
+      if (cursor_pos.row == 0) {
 
         // Can only leave mini board if free == true
         if (free) {
 
           // Cursor is moving to a new mini board
-          cursor_position.board -= 3;
-          cursor_position.row = 3;
+          cursor_pos.board -= 3;
+          cursor_pos.row = 3;
           t--;
 
-          finished = finished_boards[cursor_position.board];
+          finished = finished_boards[cursor_pos.board];
           if (finished) {
             finished.style = {
               fg: finished.style.fg,
@@ -262,17 +265,20 @@ screen.key('up', function() {
 
         } else {
           // Undo below
-          cursor_position.row++;
+          cursor_pos.row++;
           t += 2;
         }
       }
 
-      cursor_position.row--;
+      cursor_pos.row--;
       cursor.top = t - 2;
     }
   }
 
-  // console.log(cursor_position.row + ', ' + cursor_position.col);
+  if (!game.playable(cursor_pos.board, cursor_pos.row, cursor_pos.col))
+    cursor.style.fg = 'red';
+
+  // console.log(cursor_pos.row + ', ' + cursor_pos.col);
   screen.render();
 });
 
@@ -282,11 +288,11 @@ screen.key('left', function() {
 
   // Can't leave board space
   if (l > 0) {
-    if (finished_boards[cursor_position.board]) {
+    if (finished_boards[cursor_pos.board]) {
       // Somewhere in a finished board
 
       // Reset bg color of old cover
-      var finished = finished_boards[cursor_position.board];
+      var finished = finished_boards[cursor_pos.board];
       if (finished) {
         finished.style = {
           fg: finished.style.fg,
@@ -297,19 +303,19 @@ screen.key('left', function() {
       // Move cursor straight to next mini board
       if (l >= 14) {
         cursor.left = 9;
-        cursor_position.col = 2;
-        cursor_position.board--;
+        cursor_pos.col = 2;
+        cursor_pos.board--;
 
         if (l >= 28)
           cursor.left = 23;
 
       } else {
         cursor.left = l - 3;
-        cursor_position.col--;
+        cursor_pos.col--;
       }
 
       // Highlight current cover
-      var finished = finished_boards[cursor_position.board];
+      var finished = finished_boards[cursor_pos.board];
       if (finished) {
         finished.style = {
           fg: finished.style.fg,
@@ -320,17 +326,17 @@ screen.key('left', function() {
     } else {
 
       // Regular move
-      if (cursor_position.col == 0) {
+      if (cursor_pos.col == 0) {
 
         // Can only leave mini board if free == true
         if (free) {
 
           // Cursor is moving to a new mini board
-          cursor_position.board--;
-          cursor_position.col = 3;
+          cursor_pos.board--;
+          cursor_pos.col = 3;
           l -= 2;
 
-          var finished = finished_boards[cursor_position.board];
+          var finished = finished_boards[cursor_pos.board];
           if (finished) {
             finished.style = {
               fg: finished.style.fg,
@@ -340,17 +346,20 @@ screen.key('left', function() {
 
         } else {
           // Undo below
-          cursor_position.col++;
+          cursor_pos.col++;
           l += 4;
         }
       }
 
-      cursor_position.col--;
+      cursor_pos.col--;
       cursor.left = l - 3;
     }
   }
 
-  // console.log(cursor_position.row + ', ' + cursor_position.col);
+  if (!game.playable(cursor_pos.board, cursor_pos.row, cursor_pos.col))
+    cursor.style.fg = 'red';
+
+  // console.log(cursor_pos.row + ', ' + cursor_pos.col);
   screen.render();
 });
 
@@ -360,11 +369,11 @@ screen.key('right', function() {
   // Can't leave board space
   var l = cursor.left - 5;
   if (l < 36) {
-    if (finished_boards[cursor_position.board]) {
+    if (finished_boards[cursor_pos.board]) {
       // Somewhere in a finished board
 
       // Reset bg color of old cover
-      var finished = finished_boards[cursor_position.board];
+      var finished = finished_boards[cursor_pos.board];
       if (finished) {
         finished.style = {
           fg: finished.style.fg,
@@ -375,19 +384,19 @@ screen.key('right', function() {
       // Move cursor straight to next mini board
       if (l <= 22) {
         cursor.left = 29;
-        cursor_position.col = 0;
-        cursor_position.board++;
+        cursor_pos.col = 0;
+        cursor_pos.board++;
 
         if (l <= 8)
           cursor.left = 15;
 
       } else {
         cursor.left = l + 5;
-        cursor_position.col++;
+        cursor_pos.col++;
       }
 
       // Highlight current cover
-      var finished = finished_boards[cursor_position.board];
+      var finished = finished_boards[cursor_pos.board];
       if (finished) {
         finished.style = {
           fg: finished.style.fg,
@@ -398,17 +407,17 @@ screen.key('right', function() {
     } else {
 
       // Regular move
-      if (cursor_position.col == 2) {
+      if (cursor_pos.col == 2) {
 
         // Can only leave mini board if free == true
         if (free) {
 
           // Cursor is moving to a new mini board
-          cursor_position.board++;
-          cursor_position.col = -1;
+          cursor_pos.board++;
+          cursor_pos.col = -1;
           l += 2;
 
-          var finished = finished_boards[cursor_position.board];
+          var finished = finished_boards[cursor_pos.board];
           if (finished) {
             finished.style = {
               fg: finished.style.fg,
@@ -418,17 +427,20 @@ screen.key('right', function() {
 
         } else {
           // Undo below
-          cursor_position.col--;
+          cursor_pos.col--;
           l -= 4;
         }
       }
 
-      cursor_position.col++;
+      cursor_pos.col++;
       cursor.left = l + 5;
     }
   }
 
-  // console.log(cursor_position.row + ', ' + cursor_position.col);
+  if (!game.playable(cursor_pos.board, cursor_pos.row, cursor_pos.col))
+    cursor.style.fg = 'red';
+
+  // console.log(cursor_pos.row + ', ' + cursor_pos.col);
   screen.render();
 });
 
@@ -468,13 +480,13 @@ screen.key('x', function() {
 // Space makes the move for a player
 screen.key('space', function() {
   // Ignore if mini board completed
-  if (finished_boards[cursor_position.board] || !playing) return;
+  if (finished_boards[cursor_pos.board] || !playing) return;
 
   free = false;
   var t = (o_turn) ? 'o' : 'x';
-  var which = cursor_position.board;
-  var r = cursor_position.row;
-  var c = cursor_position.col;
+  var which = cursor_pos.board;
+  var r = cursor_pos.row;
+  var c = cursor_pos.col;
 
   var success = game.make_move(which, r, c, t);
 
@@ -507,12 +519,17 @@ screen.key('space', function() {
     }
 
     // Move cursor to appropriate board
-    cursor_position.board = r * 3 + c;
+    cursor_pos.board = r * 3 + c;
     cursor.top  = (7 * r)  + (2 * r);
     cursor.left = (14 * c) + (4 * c) + 1;
 
+    // Make cursor red if current square not playable
+    if (!game.playable(cursor_pos.board, cursor_pos.row, cursor_pos.col))
+      cursor.style.fg = 'red';
+
+
     // Highlight new box if finished
-    var finished = finished_boards[cursor_position.board];
+    var finished = finished_boards[cursor_pos.board];
     if (finished) {
       finished.style = {
         fg: finished.style.fg,
@@ -569,7 +586,7 @@ screen.key('space', function() {
       });
 
       // Highlight if cursor is not leaving
-      if (which == cursor_position.board) {
+      if (which == cursor_pos.board) {
         finished.style.bg = '#333333';
       }
 
@@ -680,7 +697,7 @@ screen.on('keypress', function (ch, key) {
         additions = [];
 
         // Reset cursor
-        cursor_position = {
+        cursor_pos = {
           board: 0,
           row: 0,
           col: 0

@@ -23,6 +23,25 @@ module.exports = (function () {
   }
 
   /**
+   * Checks if someone has played at position (r, c) on board b
+   *
+   * @param   {int}    b The index of the board on which to play
+   * @param   {int}    r The row of the board
+   * @param   {int}    c The column of the board
+   *
+   * @returns {bool}     False if there is a character at (r, c) on b
+   */
+  Board.prototype.playable = function (b, r, c) {
+    var board = this.boards[b];
+
+    if (board[r][c] === 'o' || board[r][c] === 'x')
+      return false;
+
+    else
+      return true;
+  }
+
+  /**
    * Attempts to place character o on board b at coordinates (r, c). Fails if
    *   there is already a character there
    *
