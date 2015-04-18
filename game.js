@@ -5,7 +5,7 @@ var Board = require('./board');
 // Manages the backend of the board, e.g. who won/lost
 var game = new Board();
 
-var o_turn = false;
+var o_turn = true;
 
 // Initial position of the player's cursor
 var cursor_position = {
@@ -427,7 +427,7 @@ screen.key('space', function() {
   // Ignore if mini board completed
   if (finished_boards[cursor_position.board]) return;
 
-  var c = (o_turn) ? 'x' : 'o';
+  var c = (o_turn) ? 'o' : 'x';
   var which = cursor_position.board;
 
   var success = game.make_move(which, cursor_position.row, cursor_position.col, c);
