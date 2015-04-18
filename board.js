@@ -22,11 +22,24 @@ module.exports = (function () {
     }
   }
 
+  /**
+   * Attempts to place character o on board b at coordinates (r, c). Fails if
+   *   there is already a character there
+   *
+   * @param   {int}    b The index of the board on which to play
+   * @param   {int}    r The row of the board
+   * @param   {int}    c The column of the board
+   * @param   {string} o The character to place
+   *
+   * @returns {bool}     True if the character was placed, false if there was
+   *   already a character there
+   */
   Board.prototype.make_move = function (b, r, c, o) {
     var board = this.boards[b];
 
     if (board[r][c] === 'o' || board[r][c] === 'x') {
       return false;
+
     } else {
       this.boards[b][r][c] = o;
       this.moves_on_board[b]++;
@@ -35,6 +48,14 @@ module.exports = (function () {
     }
   }
 
+  /**
+   * Checks if a mini board has ended. Returns the character that won, tie in
+   *   case of a tie, or undetermined.
+   *
+   * @param   {int}    b The index of the board to check
+   *
+   * @returns {string}   The winner or undetermined
+   */
   Board.prototype.won_board = function (b) {
     var board = this.boards[b];
 
@@ -71,6 +92,12 @@ module.exports = (function () {
     }
   }
 
+  /**
+   * Checks if the major board has been won. Returns the character for the
+   *   winner, tie, or undetermined.
+   *
+   * @returns {string} The winner of the entire game
+   */
   Board.prototype.won_game = function () {
     var major = this.major_board;
 

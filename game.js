@@ -2,14 +2,19 @@
 var blessed = require('blessed');
 var Board = require('./board');
 
+// Manages the backend of the board, e.g. who won/lost
 var game = new Board();
 
 var o_turn = false;
+
+// Initial position of the player's cursor
 var cursor_position = {
   board: 0,
   row: 0,
   col: 0
 }
+
+// Keeps track of which mini boards have ended and their winners
 var finished_boards = [];
 
 var screen = blessed.screen({
@@ -19,6 +24,7 @@ var screen = blessed.screen({
 
 screen.title = 'Ultimate TermTacToe';
 
+// Container for the game
 var container = blessed.box({
   top: 'center',
   left: 'center',
@@ -43,6 +49,7 @@ var container = blessed.box({
   }
 });
 
+// Background board layout
 var initial_board = '' +
   '   │   │         │   │         │   │   \n' +
   '───┼───┼───   ───┼───┼───   ───┼───┼───\n' +
@@ -64,9 +71,9 @@ var initial_board = '' +
   '     {green-fg}7             8             9{/green-fg}   \n\n';
 
 container.content = initial_board;
-
 screen.append(container);
 
+// The player cursor
 var cursor = blessed.box({
   content: '█',
   top: 0,
@@ -81,18 +88,21 @@ var cursor = blessed.box({
 });
 
 container.append(cursor);
+screen.render();
 
 // Quit on Escape, q, or Control-C.
 screen.key(['escape', 'q', 'C-c'], function() {
   return process.exit(0);
 });
 
-/* Key events */
+/* Key events for gameplay */
 // Because of padding in container, get methods are offset
+
 screen.key('down', function() {
   var t = cursor.top - 2;
   cursor.style.fg = 'white';
 
+  // Can't leave board space
   if (t < 18) {
     if (finished_boards[cursor_position.board]) {
       // Somewhere in a finished board
@@ -161,6 +171,7 @@ screen.key('up', function() {
   var t = cursor.top - 2;
   cursor.style.fg = 'white';
 
+  // Can't leave board space
   if (t > 0) {
     if (finished_boards[cursor_position.board]) {
       // Somewhere in a finished board
@@ -236,6 +247,7 @@ screen.key('left', function() {
   var l = cursor.left - 5;
   cursor.style.fg = 'white';
 
+  // Can't leave board space
   if (l > 0) {
     if (finished_boards[cursor_position.board]) {
       // Somewhere in a finished board
@@ -311,6 +323,7 @@ screen.key('left', function() {
 screen.key('right', function() {
   cursor.style.fg = 'white';
 
+  // Can't leave board space
   var l = cursor.left - 5;
   if (l < 36) {
     if (finished_boards[cursor_position.board]) {
@@ -411,7 +424,7 @@ screen.key('x', function() {
 });
 
 screen.key('space', function() {
-  // Ignore if completed
+  // Ignore if mini board completed
   if (finished_boards[cursor_position.board]) return;
 
   var c = (o_turn) ? 'x' : 'o';
@@ -487,8 +500,6 @@ screen.key('space', function() {
 
   screen.render();
 });
-
-screen.render();
 
 /**
  * Converts a character to a large ASCII version.
