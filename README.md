@@ -12,6 +12,8 @@ entire game, you have to win a row, column, or diagonal of the major board.
 
 ## Playing
 
+You have to have Node.js installed.
+
 Clone the repo, install dependencies, then run `game.js`:
 
     $ git clone https://github.com/ajay-gandhi/ultimate_termtactoe.git

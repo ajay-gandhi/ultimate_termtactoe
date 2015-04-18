@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 
 var blessed = require('blessed');
 var Board = require('./board');
@@ -653,10 +654,10 @@ screen.on('keypress', function (ch, key) {
         style: {
           bg: 'blue',
           focus: {
-            bg: 'red'
+            bg: 'green'
           },
           hover: {
-            bg: 'red'
+            bg: 'green'
           }
         }
       });
@@ -674,10 +675,10 @@ screen.on('keypress', function (ch, key) {
         style: {
           bg: 'blue',
           focus: {
-            bg: 'red'
+            bg: 'green'
           },
           hover: {
-            bg: 'red'
+            bg: 'green'
           }
         }
       });
