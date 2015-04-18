@@ -5,7 +5,11 @@ var Board = require('./board');
 // Manages the backend of the board, e.g. who won/lost
 var game = new Board();
 
-var o_turn = true;
+var o_turn = true,
+    playing = true,
+    over,
+    display_replay = false,
+    replay_form;
 
 // Initial position of the player's cursor
 var cursor_position = {
@@ -399,33 +403,41 @@ screen.key('right', function() {
 
 screen.key('x', function() {
   game_over = 'tie';
+  playing = false;
 
-  var over = blessed.box({
-    top: 'center',
-    left: 'center',
-    width: 55,
-    height: 20,
-    content: ascii_winner(game_over),
-    align: 'center',
-    valign: 'bottom',
-    border: {
-      type: 'line',
-      fg: 'white'
-    },
-    style: {
-      fg: color_of(game_over),
-      bg: 'black'
-    }
-  });
+  if (over) {
+    over.content = ascii_winner(game_over);
+    over.style.fg = color_of(game_over);
+    over.show();
+  } else {
+    over = blessed.box({
+      top: 'center',
+      left: 'center',
+      width: 55,
+      height: 20,
+      content: ascii_winner(game_over),
+      align: 'center',
+      valign: 'bottom',
+      border: {
+        type: 'line',
+        fg: 'white'
+      },
+      style: {
+        fg: color_of(game_over),
+        bg: 'black'
+      }
+    });
 
-  container.append(over);
+    container.append(over);
+  }
 
   screen.render();
 });
 
+// Space makes the move for a player
 screen.key('space', function() {
   // Ignore if mini board completed
-  if (finished_boards[cursor_position.board]) return;
+  if (finished_boards[cursor_position.board] || !playing) return;
 
   var c = (o_turn) ? 'o' : 'x';
   var which = cursor_position.board;
@@ -453,25 +465,33 @@ screen.key('space', function() {
 
     if (game_over !== 'undetermined') {
 
-      var over = blessed.box({
-        top: 'center',
-        left: 'center',
-        width: 70,
-        height: 20,
-        content: ascii_winner(game_over),
-        align: 'center',
-        valign: 'bottom',
-        border: {
-          type: 'line',
-          fg: 'white'
-        },
-        style: {
-          fg: 'white',
-          bg: 'black'
-        }
-      });
+      playing = false;
 
-      container.append(over);
+      if (over) {
+        over.content = ascii_winner(game_over);
+        over.style.fg = color_of(game_over);
+        over.show();
+      } else {
+        over = blessed.box({
+          top: 'center',
+          left: 'center',
+          width: 55,
+          height: 20,
+          content: ascii_winner(game_over),
+          align: 'center',
+          valign: 'bottom',
+          border: {
+            type: 'line',
+            fg: 'white'
+          },
+          style: {
+            fg: color_of(game_over),
+            bg: 'black'
+          }
+        });
+
+        container.append(over);
+      }
 
     } else if (ended !== 'undetermined') {
 
@@ -499,6 +519,108 @@ screen.key('space', function() {
   }
 
   screen.render();
+});
+
+// Activated only for after game ends
+screen.on('keypress', function (ch, key) {
+  if (!playing) {
+
+    // Display form before allowing button selection
+    if (!display_replay) {
+      // If already exists just show its
+      if (replay_form) {
+        replay_form.show();
+        display_replay = true;
+        return;
+      }
+
+      display_replay = true;
+
+      // Display form
+      replay_form = blessed.form({
+        keys: true,
+        top: 'center',
+        left: 'center',
+        width: 25,
+        height: 7,
+        padding: {
+          top: 1
+        },
+        align: 'center',
+        valign: 'center',
+        content: 'Play again?',
+        border: {
+          type: 'line',
+          fg: 'red'
+        }
+      });
+
+      var yes = blessed.button({
+        parent: replay_form,
+        keys: true,
+        top: 2,
+        left: 4,
+        width: 7,
+        height: 1,
+        align: 'center',
+        name: 'yes',
+        content: 'Yes',
+        style: {
+          bg: 'blue',
+          focus: {
+            bg: 'red'
+          },
+          hover: {
+            bg: 'red'
+          }
+        }
+      });
+
+      var no = blessed.button({
+        parent: replay_form,
+        keys: true,
+        top: 2,
+        right: 4,
+        width: 6,
+        height: 1,
+        align: 'center',
+        name: 'No',
+        content: 'No',
+        style: {
+          bg: 'blue',
+          focus: {
+            bg: 'red'
+          },
+          hover: {
+            bg: 'red'
+          }
+        }
+      });
+
+      no.on('press', function() {
+        return process.exit(0);
+      });
+
+      yes.on('press', function () {
+        game = new Board();
+        playing = true;
+        replay_form.hide();
+        over.hide();
+        display_replay = false;
+        screen.render();
+      });
+
+      container.append(replay_form);
+      screen.render();
+
+    } else {
+      // Allow tabs, arrows, etc to select new form button
+      var allowed = ['up', 'down', 'left', 'right', 'tab'];
+      if (allowed.indexOf(key.name) >= 0) {
+        replay_form.focusNext();
+      }
+    }
+  }
 });
 
 /**
