@@ -21,6 +21,9 @@ var cursor_position = {
 // Keeps track of which mini boards have ended and their winners
 var finished_boards = [];
 
+// Keep track of what's been added to the screen for reset
+var additions = [];
+
 var screen = blessed.screen({
   autoPadding: true,
   smartCSR: true
@@ -472,6 +475,7 @@ screen.key('space', function() {
     });
 
     container.append(played);
+    additions.push(played);
     played.setBack();
 
     o_turn = !o_turn; 
@@ -527,6 +531,7 @@ screen.key('space', function() {
       finished_boards[which] = finished;
 
       container.append(finished);
+      additions.push(finished);
 
     }
 
@@ -621,6 +626,21 @@ screen.on('keypress', function (ch, key) {
       yes.on('press', function () {
         game = new Board();
         playing = true;
+
+        // Delete everything on the board
+        for (i = 0; i < additions.length; i++) {
+          container.remove(additions[i]);
+        }
+        additions = [];
+
+        // Reset cursor
+        cursor_position = {
+          board: 0,
+          row: 0,
+          col: 0
+        }
+        cursor.top = 0;
+        cursor.left = 1;
 
         // Hide form and winner cover
         replay_form.hide();
