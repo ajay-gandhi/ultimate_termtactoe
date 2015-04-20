@@ -12,23 +12,34 @@ entire game, you have to win a row, column, or diagonal of the major board.
 
 ## Playing
 
-You have to have Node.js installed.
+You must have Node.js installed.
 
-Clone the repo, install dependencies, then run `game.js`:
+Clone the repo, install dependencies, then run `app.js`:
 
     $ git clone https://github.com/ajay-gandhi/ultimate_termtactoe.git
     $ cd ultimate_termtactoe
     $ npm install
     
-    $ node game.js
+    $ ./app.js
 
-Use the `arrow` keys to navigate through the boards and the `[spacebar]` to make
-a move.
+Use the `-h` flag to see a list of options
+
+### Server Multiplayer
+
+There is also an option to create a server so that you can play against someone
+on a different computer:
+
+    $ ./app.js -m            # Create a server
+    $ ./app.js -c host:port  # Connect to a server
+
+The server is implemented using Socket.io.
 
 ## Features
 
-Right now, the game can only be played on a single computer with another human.
+~~Right now, the game can only be played on a single computer with another
+human.~~
 I'm thinking of adding these features though:
 
  * An AI for you to play against
- * A local server so that you can play against someone on another computer
+ * ~~A local server so that you can play against someone on another computer~~
+   _Done_
