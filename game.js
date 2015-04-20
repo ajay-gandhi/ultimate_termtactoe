@@ -596,7 +596,7 @@ module.exports.start = function (game_type, connection, player) {
   });
 
   // Space makes the move for a player
-  screen.key('space', function() {
+  screen.key(['space', 'enter'], function() {
     // Only do something if player's turn
     if ((is_o == o_turn) || (game_type != 3)) {
 
