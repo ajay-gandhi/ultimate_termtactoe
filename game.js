@@ -636,7 +636,7 @@ module.exports.start = function (game_type, connection, player) {
           }
         }
 
-        cursor_pos = ai_move.move;
+        cursor_pos  = ai_move.move;
         cursor.top  = (2 * cursor_pos.row) + (7 * Math.floor(cursor_pos.board / 3));
         cursor.left = (4 * cursor_pos.col) + (14 * (cursor_pos.board % 3)) + 1;
 

@@ -3,12 +3,13 @@ var Board = require('./board');
 
 // AI is always x, player is o
 var opt_move = function (game, player_turn, free, which, depth) {
+  // Evaluate and return score if game over or depth 0
   if (depth == 0 || game.won_game() !== 'undetermined') {
     return { score: evaluate_board(game), move: -1 };
   }
 
-  var best_score = 0,
-      best_move;
+  var best_scores = [-1],
+      best_moves;
 
   if (player_turn) {
     // Assume minimize
@@ -18,10 +19,7 @@ var opt_move = function (game, player_turn, free, which, depth) {
       for (var k = 0; k < 9; k++) {
 
         // Disallow if this board has been won
-        if (game.won_board(k) !== 'undetermined') {
-          console.log(k, 'is done');
-          break;
-        }
+        if (game.won_board(k) !== 'undetermined') continue;
 
         for (var j = 0; j < 3; j++) {
           for (var i = 0; i < 3; i++) {
@@ -41,13 +39,22 @@ var opt_move = function (game, player_turn, free, which, depth) {
               var new_score  = opt_move(temp, false, is_won, next_board, depth - 1).score;
 
               // Set this to best move if score higher
-              if (new_score <= best_score) {
-                best_score = new_score;
-                best_move = {
+              // All elements in best_scores should be equal value
+              if (new_score < best_scores[0]) {
+                best_scores = [new_score];
+                best_moves = [{
                   board: k,
                   row: j,
                   col: i
-                };
+                }];
+
+              } else if (new_score == best_scores[0]) {
+                best_scores.push(new_score);
+                best_moves.push({
+                  board: which,
+                  row: j,
+                  col: i
+                });
               }
 
             }
@@ -75,13 +82,21 @@ var opt_move = function (game, player_turn, free, which, depth) {
             var new_score  = opt_move(temp, false, is_won, next_board, depth - 1).score;
 
             // Set this to best move if score higher
-            if (new_score <= best_score) {
-              best_score = new_score;
-              best_move = {
+            if (new_score < best_scores[0]) {
+              best_scores = [new_score];
+              best_moves = [{
                 board: which,
                 row: j,
                 col: i
-              }
+              }];
+
+            } else if (new_score == best_scores[0]) {
+              best_scores.push(new_score);
+              best_moves.push({
+                board: which,
+                row: j,
+                col: i
+              });
             }
 
           }
@@ -97,9 +112,7 @@ var opt_move = function (game, player_turn, free, which, depth) {
       for (var k = 0; k < 9; k++) {
 
         // Disallow if this board has been won
-        if (game.won_board(k) !== 'undetermined') {
-          break;
-        }
+        if (game.won_board(k) !== 'undetermined') continue;
 
         for (var j = 0; j < 3; j++) {
           for (var i = 0; i < 3; i++) {
@@ -119,13 +132,21 @@ var opt_move = function (game, player_turn, free, which, depth) {
               var new_score  = opt_move(temp, true, is_won, next_board, depth - 1).score;
 
               // Set this to best move if score higher
-              if (new_score >= best_score) {
-                best_score = new_score;
-                best_move = {
+              if (new_score > best_scores) {
+                best_scores = [new_score];
+                best_moves = [{
                   board: k,
                   row: j,
                   col: i
-                }
+                }];
+
+              } else if (new_score == best_scores[0]) {
+                best_scores.push(new_score);
+                best_moves.push({
+                  board: which,
+                  row: j,
+                  col: i
+                });
               }
             }
           }
@@ -152,13 +173,21 @@ var opt_move = function (game, player_turn, free, which, depth) {
             var new_score  = opt_move(temp, true, is_won, next_board, depth - 1).score;
 
             // Set this to best move if score higher
-            if (new_score >= best_score) {
-              best_score = new_score;
-              best_move = {
+            if (new_score > best_scores) {
+              best_scores = [new_score];
+              best_moves = [{
                 board: which,
                 row: j,
                 col: i
-              }
+              }];
+
+            } else if (new_score == best_scores[0]) {
+              best_scores.push(new_score);
+              best_moves.push({
+                board: which,
+                row: j,
+                col: i
+              });
             }
 
           }
@@ -167,6 +196,11 @@ var opt_move = function (game, player_turn, free, which, depth) {
 
     }
   }
+
+  // Get random move from best moves
+  var index = Math.floor(Math.random() * best_moves.length);
+  var best_score = best_scores[index];
+  var best_move = best_moves[index];
 
   return { score: best_score, move: best_move };
 }

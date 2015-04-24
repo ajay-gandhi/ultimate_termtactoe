@@ -63,9 +63,6 @@ module.exports = (function () {
    */
   Board.prototype.make_move = function (b, r, c, o) {
     var board = this.boards[b];
-    if (!board) {
-      console.log('h');
-    } else {
 
     if (board[r][c] === 'o' || board[r][c] === 'x') {
       return false;
@@ -76,7 +73,6 @@ module.exports = (function () {
 
       return true;
     }
-  }
   }
 
   /**
