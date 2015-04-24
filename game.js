@@ -626,7 +626,7 @@ module.exports.start = function (game_type, connection, player) {
       screen.render();
 
       if (game_type == 1 && !o_turn && game.won_game() === 'undetermined') {
-        var ai_move = AI.opt_move(game, false, free, cursor_pos.board, 1);
+        var ai_move = AI.opt_move(game, false, free, cursor_pos.board, 3);
 
         var finished = finished_boards[cursor_pos.board];
         if (finished) {
@@ -1159,7 +1159,7 @@ module.exports.start = function (game_type, connection, player) {
 
   // If x goes first, ai needs to play
   if (game_type == 1 && !o_turn) {
-    var ai_move = AI.opt_move(game, false, free, cursor_pos.board, 1);
+    var ai_move = AI.opt_move(game, false, free, cursor_pos.board, 3);
 
     cursor_pos = ai_move.move;
     cursor.top  = (2 * cursor_pos.row) + (7 * Math.floor(cursor_pos.board / 3));

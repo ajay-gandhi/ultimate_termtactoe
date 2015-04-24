@@ -40,9 +40,9 @@ var opt_move = function (game, player_turn, free, which, depth) {
 
               // Set this to best move if score higher
               // All elements in best_scores should be equal value
-              if (new_score < best_scores[0]) {
+              if (new_score < best_scores[0] || !best_moves) {
                 best_scores = [new_score];
-                best_moves = [{
+                best_moves  = [{
                   board: k,
                   row: j,
                   col: i
@@ -84,7 +84,7 @@ var opt_move = function (game, player_turn, free, which, depth) {
             // Set this to best move if score higher
             if (new_score < best_scores[0]) {
               best_scores = [new_score];
-              best_moves = [{
+              best_moves  = [{
                 board: which,
                 row: j,
                 col: i
@@ -134,7 +134,7 @@ var opt_move = function (game, player_turn, free, which, depth) {
               // Set this to best move if score higher
               if (new_score > best_scores) {
                 best_scores = [new_score];
-                best_moves = [{
+                best_moves  = [{
                   board: k,
                   row: j,
                   col: i
@@ -175,7 +175,7 @@ var opt_move = function (game, player_turn, free, which, depth) {
             // Set this to best move if score higher
             if (new_score > best_scores) {
               best_scores = [new_score];
-              best_moves = [{
+              best_moves  = [{
                 board: which,
                 row: j,
                 col: i
