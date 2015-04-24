@@ -1,7 +1,21 @@
+'use strict';
+/**
+ * The artificial intelligence, basic minimax search (heuristic function below)
+ */
 
 var Board = require('./board');
 
-// AI is always x, player is o
+/**
+ * Find the optimal move given the status of the game.
+ *
+ * @param   {Board} game         The Board object for the game
+ * @param   {bool}  player_turn  True if it is the human player's turn
+ * @param   {bool}  free         True the player is free to move on any board
+ * @param   {int}   which        Index of the board the player is restricted to
+ * @param   {int}   depth        How many more levels to search
+ *
+ * @returns {Object} An object containing the best move and its eval'd score
+ */
 var opt_move = function (game, player_turn, free, which, depth) {
   // Evaluate and return score if game over or depth 0
   if (depth == 0 || game.won_game() !== 'undetermined') {

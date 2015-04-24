@@ -1,5 +1,9 @@
 #!/usr/bin/env node
+'use strict';
 
+/**
+ * The command line activation for the game
+ */
 var program  = require('commander'),
     IO       = require('socket.io'),
     IOClient = require('socket.io-client');
@@ -7,7 +11,7 @@ var program  = require('commander'),
 var game = require('./game');
 
 program
-  .version('0.3.1')
+  .version('0.3.2')
   .option('-l, --local',               'Play locally with a friend')
   .option('-s, --single',              'Play against the computer')
   .option('-m, --multiplayer',         'Create a multiplayer server')

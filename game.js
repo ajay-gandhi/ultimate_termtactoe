@@ -1,3 +1,8 @@
+'use strict';
+
+/**
+ * The game itself. Handles single player, 2 player local, and 2 player server
+ */
 
 var blessed = require('blessed');
 
@@ -219,7 +224,7 @@ module.exports.start = function (game_type, connection, player) {
   });
 
   /************************* Key events for gameplay **************************/
-  // Because of padding in container, get methods are offset
+  // Note: because of padding in container, get methods are offset
 
   screen.key('down', function() {
     // Only do something if player's turn
@@ -1020,7 +1025,10 @@ module.exports.start = function (game_type, connection, player) {
 
   /******************************** Functions *********************************/
 
-  // Put in a function so it can be called lots
+  /**
+   * Makes a play.
+   * Takes no parameters because it reads local variables (e.g. cursor_pos).
+   */
   var make_play = function () {
     var t     = (o_turn) ? 'o' : 'x',
         which = cursor_pos.board,
@@ -1157,6 +1165,7 @@ module.exports.start = function (game_type, connection, player) {
     }
   }
 
+  /********************************* AI First *********************************/
   // If x goes first, ai needs to play
   if (game_type == 1 && !o_turn) {
     var ai_move = AI.opt_move(game, false, free, cursor_pos.board, 3);

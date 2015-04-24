@@ -1,3 +1,7 @@
+'use strict';
+/**
+ * This module models the abstract board. It handles plays and win checking.
+ */
 
 module.exports = (function () {
 
@@ -87,7 +91,7 @@ module.exports = (function () {
     var board = this.boards[b];
 
     // Mini board is already won
-    if (this.major_board[b] === 'o' || this.major_board[b] === 'x')
+    if (this.major_board[b] === 'o' || this.major_board[b] === 'x' || this.major_board[b] === 'tie')
       return this.major_board[b];
 
     for (j = 0; j < 3; j++) {
