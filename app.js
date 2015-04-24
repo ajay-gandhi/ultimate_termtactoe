@@ -11,7 +11,7 @@ var program  = require('commander'),
 var game = require('./game');
 
 program
-  .version('0.3.2')
+  .version('0.3.3')
   .option('-l, --local',               'Play locally with a friend')
   .option('-s, --single',              'Play against the computer')
   .option('-m, --multiplayer',         'Create a multiplayer server')

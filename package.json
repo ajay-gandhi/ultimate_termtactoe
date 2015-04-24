@@ -1,6 +1,6 @@
 {
   "name": "ultimate_termtactoe",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Ultimate tic tac toe in the terminal",
   "main": "app.js",
   "dependencies": {

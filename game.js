@@ -240,13 +240,7 @@ module.exports.start = function (game_type, connection, player) {
           // Somewhere in a finished board
 
           // Reset bg color of old cover
-          var finished = finished_boards[cursor_pos.board];
-          if (finished) {
-            finished.style = {
-              fg: finished.style.fg,
-              bg: '#000000'
-            }
-          }
+          highlight(false);
 
           // Move cursor straight to next mini board board
           if (t <= 11) {
@@ -262,13 +256,7 @@ module.exports.start = function (game_type, connection, player) {
           }
 
           // Highlight current cover
-          var finished = finished_boards[cursor_pos.board];
-          if (finished) {
-            finished.style = {
-              fg: finished.style.fg,
-              bg: '#333333'
-            }
-          }
+          highlight(true);
 
         } else {
 
@@ -283,13 +271,7 @@ module.exports.start = function (game_type, connection, player) {
               t++;
 
               // Change bg color of current cover
-              var finished = finished_boards[cursor_pos.board];
-              if (finished) {
-                finished.style = {
-                  fg: finished.style.fg,
-                  bg: '#333333'
-                }
-              }
+              highlight(true);
             
             } else {
               // Undo below
@@ -309,7 +291,6 @@ module.exports.start = function (game_type, connection, player) {
       // Send update to other player
       if (game_type == 3) connection.emit('move', cursor_pos);
 
-      // console.log(cursor_pos.row + ', ' + cursor_pos.col);
       screen.render();
     }
   });
@@ -328,13 +309,7 @@ module.exports.start = function (game_type, connection, player) {
           // Somewhere in a finished board
 
           // Reset bg color of old cover
-          var finished = finished_boards[cursor_pos.board];
-          if (finished) {
-            finished.style = {
-              fg: finished.style.fg,
-              bg: '#000000'
-            }
-          }
+          highlight(false);
 
           // Move cursor straight to next mini board
           if (t >= 7) {
@@ -350,13 +325,7 @@ module.exports.start = function (game_type, connection, player) {
           }
 
           // Highlight current cover
-          var finished = finished_boards[cursor_pos.board];
-          if (finished) {
-            finished.style = {
-              fg: finished.style.fg,
-              bg: '#333333'
-            }
-          }
+          highlight(true);
 
         } else {
       
@@ -371,13 +340,7 @@ module.exports.start = function (game_type, connection, player) {
               cursor_pos.row = 3;
               t--;
 
-              finished = finished_boards[cursor_pos.board];
-              if (finished) {
-                finished.style = {
-                  fg: finished.style.fg,
-                  bg: '#333333'
-                }
-              }
+              highlight(true);
 
             } else {
               // Undo below
@@ -397,7 +360,6 @@ module.exports.start = function (game_type, connection, player) {
       // Send update to other player
       if (game_type == 3) connection.emit('move', cursor_pos);
 
-      // console.log(cursor_pos.row + ', ' + cursor_pos.col);
       screen.render();
     }
   });
@@ -416,13 +378,7 @@ module.exports.start = function (game_type, connection, player) {
           // Somewhere in a finished board
 
           // Reset bg color of old cover
-          var finished = finished_boards[cursor_pos.board];
-          if (finished) {
-            finished.style = {
-              fg: finished.style.fg,
-              bg: '#000000'
-            }
-          }
+          highlight(false);
 
           // Move cursor straight to next mini board
           if (l >= 14) {
@@ -439,13 +395,7 @@ module.exports.start = function (game_type, connection, player) {
           }
 
           // Highlight current cover
-          var finished = finished_boards[cursor_pos.board];
-          if (finished) {
-            finished.style = {
-              fg: finished.style.fg,
-              bg: '#333333'
-            }
-          }
+          highlight(true);
 
         } else {
 
@@ -460,13 +410,7 @@ module.exports.start = function (game_type, connection, player) {
               cursor_pos.col = 3;
               l -= 2;
 
-              var finished = finished_boards[cursor_pos.board];
-              if (finished) {
-                finished.style = {
-                  fg: finished.style.fg,
-                  bg: '#333333'
-                }
-              }
+              highlight(true);
 
             } else {
               // Undo below
@@ -486,7 +430,6 @@ module.exports.start = function (game_type, connection, player) {
       // Send update to other player
       if (game_type == 3) connection.emit('move', cursor_pos);
 
-      // console.log(cursor_pos.row + ', ' + cursor_pos.col);
       screen.render();
     }
   });
@@ -505,13 +448,7 @@ module.exports.start = function (game_type, connection, player) {
           // Somewhere in a finished board
 
           // Reset bg color of old cover
-          var finished = finished_boards[cursor_pos.board];
-          if (finished) {
-            finished.style = {
-              fg: finished.style.fg,
-              bg: '#000000'
-            }
-          }
+          highlight(false);
 
           // Move cursor straight to next mini board
           if (l <= 22) {
@@ -528,13 +465,7 @@ module.exports.start = function (game_type, connection, player) {
           }
 
           // Highlight current cover
-          var finished = finished_boards[cursor_pos.board];
-          if (finished) {
-            finished.style = {
-              fg: finished.style.fg,
-              bg: '#333333'
-            }
-          }
+          highlight(true);
 
         } else {
 
@@ -549,13 +480,7 @@ module.exports.start = function (game_type, connection, player) {
               cursor_pos.col = -1;
               l += 2;
 
-              var finished = finished_boards[cursor_pos.board];
-              if (finished) {
-                finished.style = {
-                  fg: finished.style.fg,
-                  bg: '#333333'
-                }
-              }
+              highlight(true);
 
             } else {
               // Undo below
@@ -575,44 +500,8 @@ module.exports.start = function (game_type, connection, player) {
       // Send update to other player
       if (game_type == 3) connection.emit('move', cursor_pos);
 
-      // console.log(cursor_pos.row + ', ' + cursor_pos.col);
       screen.render();
     }
-  });
-
-  screen.key('x', function() {
-    game_over = 'tie';
-    playing = false;
-
-    if (game_type == 3) connection.emit('game-over', game_over);
-
-    if (over) {
-      over.content = ascii_winner(game_over);
-      over.style.fg = color_of(game_over);
-      over.show();
-    } else {
-      over = blessed.box({
-        top: 'center',
-        left: 'center',
-        width: 55,
-        height: 20,
-        content: ascii_winner(game_over),
-        align: 'center',
-        valign: 'bottom',
-        border: {
-          type: 'line',
-          fg: 'white'
-        },
-        style: {
-          fg: color_of(game_over),
-          bg: 'black'
-        }
-      });
-
-      container.append(over);
-    }
-
-    screen.render();
   });
 
   // Space makes the move for a player
@@ -633,13 +522,7 @@ module.exports.start = function (game_type, connection, player) {
       if (game_type == 1 && !o_turn && game.won_game() === 'undetermined') {
         var ai_move = AI.opt_move(game, false, free, cursor_pos.board, 3);
 
-        var finished = finished_boards[cursor_pos.board];
-        if (finished) {
-          finished.style = {
-            fg: finished.style.fg,
-            bg: '#000000'
-          }
-        }
+        highlight(false);
 
         cursor_pos  = ai_move.move;
         cursor.top  = (2 * cursor_pos.row) + (7 * Math.floor(cursor_pos.board / 3));
@@ -1024,6 +907,23 @@ module.exports.start = function (game_type, connection, player) {
   }
 
   /******************************** Functions *********************************/
+  // Note: all of these functions must stay inside game_start() since they use
+  // objects such as screen and cursor_pos
+
+  /**
+   * Highlights or unhighlights the mini-win cover at cursor_pos.board
+   *
+   * @param {bool} yes  True if the cover should be highlighted, false otherwise
+   */
+  var highlight = function (yes) {
+    var finished = finished_boards[cursor_pos.board];
+    if (finished) {
+      finished.style = {
+        fg: finished.style.fg,
+        bg: (yes) ? '#333333' : '#000000'
+      }
+    }
+  }
 
   /**
    * Makes a play.
