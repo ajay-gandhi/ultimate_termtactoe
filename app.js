@@ -12,7 +12,7 @@ var program  = require('commander'),
 var game = require('./game');
 
 program
-  .version('0.3.3')
+  .version('0.3.4')
   .option('-l, --local',               'Play locally with a friend')
   .option('-s, --single',              'Play against the computer')
   .option('-m, --multiplayer',         'Create a multiplayer server')
@@ -61,9 +61,13 @@ if (program.multiplayer) {
   // Start a game vs the AI
   game.start(1);
 
-} else {
+} else if (program.local) {
   // Regular PvP play
   // Note that the -l argument is not really parsed because the default is -l
   // If no args are passed, -l is assumed
   game.start(2);
+
+} else {
+  // Default displays help
+  program.outputHelp();
 }

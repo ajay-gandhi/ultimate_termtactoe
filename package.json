@@ -1,7 +1,11 @@
 {
   "name": "ultimate_termtactoe",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Ultimate tic tac toe in the terminal",
+  "bin": {
+    "tictactoe": "./app.js",
+    "ultimate-tictactoe": "./app.js"
+  },
   "main": "app.js",
   "dependencies": {
     "blessed": "^0.1.1",

@@ -12,17 +12,13 @@ entire game, you have to win a row, column, or diagonal of the major board.
 
 ## Playing
 
-You must have Node.js installed.
+Install Node.js, then npm install this repo:
 
-Clone the repo, install dependencies, then run `app.js`:
+    $ npm install -g ajay-gandhi/ultimate_termtactoe
 
-    $ git clone https://github.com/ajay-gandhi/ultimate_termtactoe.git
-    $ cd ultimate_termtactoe
-    $ npm install
-    
-    $ ./app.js
+Run `tictactoe` or `ultimate-tictactoe` to display options:
 
-Use the `-h` flag to see a list of options
+    $ tictactoe
 
 ### Server Multiplayer
 
@@ -32,6 +28,8 @@ on a different computer:
     $ ./app.js -m            # Create a server
     $ ./app.js -c host:port  # Connect to a server
 
+When you host a server, it will print the host and port the second player should connect to.
+
 The server is implemented using Socket.io.
 
 ## Features
@@ -40,6 +38,8 @@ The server is implemented using Socket.io.
 human.~~
 I'm thinking of adding these features though:
 
- * An AI for you to play against
+ * ~~An AI for you to play against~~ _Done_ But it's really weak. I'm trying to
+   improve the heuristics, and I'm pretty sure there are a few bugs with the
+   minimax algorithm too :(
  * ~~A local server so that you can play against someone on another computer~~
    _Done_
