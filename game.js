@@ -1,7 +1,8 @@
 
 var blessed = require('blessed');
 
-var Board = require('./board');
+var Board = require('./board'),
+    AI    = require('./ai');
 
 /**
  * Starts the game
@@ -18,7 +19,11 @@ var Board = require('./board');
 module.exports.start = function (game_type, connection, player) {
 
   // Boolean representing if player is o (see @param player)
-  var is_o = (player == 1);
+  var is_o;
+  if (game_type == 3)
+    is_o = (player == 1);
+  else
+    is_o = true;
 
   // Manages the backend of the board, e.g. who won/lost a mini board
   var game = new Board();
@@ -26,11 +31,13 @@ module.exports.start = function (game_type, connection, player) {
   var o_turn = (Math.random() > 0.5) ? true : false,
       cursor_color = (o_turn == is_o) ? 'white' : 'blue';
 
-  if (game_type != 3) cursor_color = 'white';
 
-  // Send or receive first turn
+  // Send first turn
   if (game_type == 3) {
     if (is_o) connection.emit('o-first', o_turn);
+
+  } else {
+    cursor_color = 'white';
   }
 
   var free = false,
@@ -216,7 +223,9 @@ module.exports.start = function (game_type, connection, player) {
 
   screen.key('down', function() {
     // Only do something if player's turn
-    if ((is_o == o_turn) || (game_type != 3)) {
+    if ((game_type == 2) ||
+        (game_type == 1 && o_turn) ||
+        (game_type == 3 && is_o == o_turn)) {
       var t = cursor.top - 2;
       cursor.style.fg = cursor_color;
 
@@ -302,7 +311,9 @@ module.exports.start = function (game_type, connection, player) {
 
   screen.key('up', function() {
     // Only do something if player's turn
-    if ((is_o == o_turn) || (game_type != 3)) {
+    if ((game_type == 2) ||
+        (game_type == 1 && o_turn) ||
+        (game_type == 3 && is_o == o_turn)) {
       var t = cursor.top - 2;
       cursor.style.fg = cursor_color;
 
@@ -388,7 +399,9 @@ module.exports.start = function (game_type, connection, player) {
 
   screen.key('left', function() {
     // Only do something if player's turn
-    if ((is_o == o_turn) || (game_type != 3)) {
+    if ((game_type == 2) ||
+        (game_type == 1 && o_turn) ||
+        (game_type == 3 && is_o == o_turn)) {
       var l = cursor.left - 5;
       cursor.style.fg = cursor_color;
 
@@ -475,7 +488,9 @@ module.exports.start = function (game_type, connection, player) {
 
   screen.key('right', function() {
     // Only do something if player's turn
-    if ((is_o == o_turn) || (game_type != 3)) {
+    if ((game_type == 2) ||
+        (game_type == 1 && o_turn) ||
+        (game_type == 3 && is_o == o_turn)) {
       cursor.style.fg = cursor_color;
 
       // Can't leave board space
@@ -596,50 +611,24 @@ module.exports.start = function (game_type, connection, player) {
   });
 
   // Space makes the move for a player
-  screen.key(['space', 'enter'], function() {
+  screen.key(['space', 'enter', 'o', 'x'], function() {
+
     // Only do something if player's turn
-    if ((is_o == o_turn) || (game_type != 3)) {
+    if ((game_type == 2) ||
+        (game_type == 1 && o_turn) ||
+        (game_type == 3 && is_o == o_turn)) {
 
       // Ignore if mini board completed
       if (finished_boards[cursor_pos.board] || !playing) return;
 
-      var t     = (o_turn) ? 'o' : 'x',
-          which = cursor_pos.board,
-          r     = cursor_pos.row,
-          c     = cursor_pos.col;
-          free  = false;
+      make_play();
 
-      var success = game.make_move(which, r, c, t);
+      screen.render();
 
-      // Move was possible, i.e. spot was empty
-      if (success) {
-        // Add x or o to board
-        var played = blessed.box({
-          content: t,
-          top: cursor.top - 2,
-          left: cursor.left - 4,
-          width: 1,
-          height: 1
-        });
+      if (game_type == 1 && !o_turn && game.won_game() === 'undetermined') {
+        var ai_move = AI.opt_move(game, false, free, cursor_pos.board, 1);
 
-        container.append(played);
-        additions.push(played);
-        played.setBack();
-
-
-        // Send play
-        if (game_type == 3) {
-          connection.emit('play', cursor_pos);
-          cursor_color = 'blue';
-        }
-
-        // Toggle turn
-        o_turn = !o_turn;
-        cursor.style.fg = cursor_color;
-        current_turn.content = 'Turn: ' + ((o_turn) ? 'o' : 'x');
-
-        // Un-highlight old box if finished
-        var finished = finished_boards[which];
+        var finished = finished_boards[cursor_pos.board];
         if (finished) {
           finished.style = {
             fg: finished.style.fg,
@@ -647,102 +636,14 @@ module.exports.start = function (game_type, connection, player) {
           }
         }
 
-        // Move cursor to appropriate board
-        cursor_pos.board = r * 3 + c;
-        cursor.top  = (7 * r)  + (2 * r);
-        cursor.left = (14 * c) + (4 * c) + 1;
+        cursor_pos = ai_move.move;
+        cursor.top  = (2 * cursor_pos.row) + (7 * Math.floor(cursor_pos.board / 3));
+        cursor.left = (4 * cursor_pos.col) + (14 * (cursor_pos.board % 3)) + 1;
 
-        // Make cursor red if current square not playable
-        if (!game.playable(cursor_pos.board, cursor_pos.row, cursor_pos.col))
-          cursor.style.fg = 'red';
+        make_play();
 
-
-        // Highlight new box if finished
-        var finished = finished_boards[cursor_pos.board];
-        if (finished) {
-          finished.style = {
-            fg: finished.style.fg,
-            bg: '#333333'
-          }
-          free = true;
-        }
-
-        // Check if game or mini game over
-        var mini_ended = game.won_board(which);
-        var game_over  = game.won_game();
-
-        if (game_over !== 'undetermined') {
-
-          playing = false;
-
-          // Send win
-          if (game_type == 3) connection.emit('game-over', game_over);
-
-          if (over) {
-            over.content = ascii_winner(game_over);
-            over.style.fg = color_of(game_over);
-            over.show();
-
-          } else {
-            over = blessed.box({
-              top: 'center',
-              left: 'center',
-              width: 55,
-              height: 20,
-              content: ascii_winner(game_over),
-              align: 'center',
-              valign: 'bottom',
-              border: {
-                type: 'line',
-                fg: 'white'
-              },
-              style: {
-                fg: color_of(game_over),
-                bg: 'black'
-              }
-            });
-
-            container.append(over);
-          }
-
-        } else if (mini_ended !== 'undetermined') {
-
-          // Send win
-          if (game_type == 3) connection.emit('mini-win', {
-            winner: mini_ended,
-            board: which
-          });
-
-          var finished = blessed.box({
-            content: bigify(mini_ended),
-            top: (Math.floor(which / 3)) * 7,
-            left: (which % 3) * 14,
-            width: 11,
-            height: 5,
-            style: {
-              bg: '#000000'
-            }
-          });
-
-          // Highlight if cursor is not leaving
-          if (which == cursor_pos.board) {
-            finished.style.bg = '#333333';
-          }
-
-          finished.style.fg = color_of(mini_ended);
-          finished_boards[which] = finished;
-
-          container.append(finished);
-          additions.push(finished);
-
-        }
-
-      } else {
-        // There is already o or x in that spot
-        cursor.style.fg = 'red';
+        screen.render();
       }
-
-      screen.render();
     }
   });
 
@@ -1115,6 +1016,158 @@ module.exports.start = function (game_type, connection, player) {
       container.append(quit);
       screen.render();
     });
+  }
+
+  /******************************** Functions *********************************/
+
+  // Put in a function so it can be called lots
+  var make_play = function () {
+    var t     = (o_turn) ? 'o' : 'x',
+        which = cursor_pos.board,
+        r     = cursor_pos.row,
+        c     = cursor_pos.col;
+        free  = false;
+
+    var success = game.make_move(which, r, c, t);
+
+    // Move was possible, i.e. spot was empty
+    if (success) {
+      // Add x or o to board
+      var played = blessed.box({
+        content: t,
+        top: cursor.top - 2,
+        left: cursor.left - 4,
+        width: 1,
+        height: 1
+      });
+
+      container.append(played);
+      additions.push(played);
+      played.setBack();
+
+      // Send play
+      if (game_type == 3) {
+        connection.emit('play', cursor_pos);
+        cursor_color = 'blue';
+      }
+
+      // Toggle turn
+      o_turn = !o_turn;
+      cursor.style.fg = cursor_color;
+      current_turn.content = 'Turn: ' + ((o_turn) ? 'o' : 'x');
+
+      // Un-highlight old box if finished
+      var finished = finished_boards[which];
+      if (finished) {
+        finished.style = {
+          fg: finished.style.fg,
+          bg: '#000000'
+        }
+      }
+
+      // Move cursor to appropriate board
+      cursor_pos.board = r * 3 + c;
+      cursor.top  = (7 * r)  + (2 * r);
+      cursor.left = (14 * c) + (4 * c) + 1;
+
+      // Make cursor red if current square not playable
+      if (!game.playable(cursor_pos.board, cursor_pos.row, cursor_pos.col))
+        cursor.style.fg = 'red';
+
+
+      // Highlight new box if finished
+      var finished = finished_boards[cursor_pos.board];
+      if (finished) {
+        finished.style = {
+          fg: finished.style.fg,
+          bg: '#333333'
+        }
+        free = true;
+      }
+
+      // Check if game or mini game over
+      var mini_ended = game.won_board(which);
+      var game_over  = game.won_game();
+
+      if (game_over !== 'undetermined') {
+
+        playing = false;
+
+        // Send win
+        if (game_type == 3) connection.emit('game-over', game_over);
+
+        if (over) {
+          over.content = ascii_winner(game_over);
+          over.style.fg = color_of(game_over);
+          over.show();
+
+        } else {
+          over = blessed.box({
+            top: 'center',
+            left: 'center',
+            width: 55,
+            height: 20,
+            content: ascii_winner(game_over),
+            align: 'center',
+            valign: 'bottom',
+            border: {
+              type: 'line',
+              fg: 'white'
+            },
+            style: {
+              fg: color_of(game_over),
+              bg: 'black'
+            }
+          });
+
+          container.append(over);
+        }
+
+      } else if (mini_ended !== 'undetermined') {
+
+        // Send win
+        if (game_type == 3) connection.emit('mini-win', {
+          winner: mini_ended,
+          board: which
+        });
+
+        var finished = blessed.box({
+          content: bigify(mini_ended),
+          top: (Math.floor(which / 3)) * 7,
+          left: (which % 3) * 14,
+          width: 11,
+          height: 5,
+          style: {
+            bg: '#000000'
+          }
+        });
+
+        // Highlight if cursor is not leaving
+        if (which == cursor_pos.board) {
+          finished.style.bg = '#333333';
+        }
+
+        finished.style.fg = color_of(mini_ended);
+        finished_boards[which] = finished;
+
+        container.append(finished);
+        additions.push(finished);
+
+      }
+    }
+  }
+
+  // If x goes first, ai needs to play
+  if (game_type == 1 && !o_turn) {
+    var ai_move = AI.opt_move(game, false, free, cursor_pos.board, 1);
+
+    cursor_pos = ai_move.move;
+    cursor.top  = (2 * cursor_pos.row) + (7 * Math.floor(cursor_pos.board / 3));
+    cursor.left = (4 * cursor_pos.col) + (14 * (cursor_pos.board % 3)) + 1;
+
+    make_play();
+
+    screen.render();
   }
 }
 

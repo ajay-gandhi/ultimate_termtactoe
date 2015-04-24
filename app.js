@@ -7,8 +7,9 @@ var program  = require('commander'),
 var game = require('./game');
 
 program
-  .version('0.2.0')
+  .version('0.3.0')
   .option('-l, --local',               'Play locally with a friend')
+  .option('-s, --single',              'Play against the computer')
   .option('-m, --multiplayer',         'Create a multiplayer server')
   .option('-c, --connect [host:port]', 'Connect to a multiplayer server')
   .parse(process.argv);
@@ -51,6 +52,10 @@ if (program.multiplayer) {
     console.log('Connected! Starting game...');
     game.start(3, socket, 2);
   });
+
+} else if (program.single) {
+  // Start a game vs the AI
+  game.start(1);
 
 } else {
   // Regular PvP play

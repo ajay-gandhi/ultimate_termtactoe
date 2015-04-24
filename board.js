@@ -1,25 +1,33 @@
 
 module.exports = (function () {
 
-  function Board () {
-    // Mini boards
-    this.boards = [];
-    this.moves_on_board = [];
+  function Board (vars) {
+    if (vars) {
+      this.boards         = vars.boards;
+      this.moves_on_board = vars.moves_on_board;
+      this.major_board    = vars.major_board;
+      this.mini_wins      = vars.mini_wins;
 
-    // Major board
-    this.major_board = [0, 1, 2, 3, 4, 5, 5, 6, 7, 8];
-    this.mini_wins = 0;
+    } else {
+      // Mini boards
+      this.boards = [];
+      this.moves_on_board = [];
 
+      // Major board
+      this.major_board = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      this.mini_wins = 0;
 
-    // Create empty 9 x (3 x 3) array
-    for (k = 0; k < 9; k++) {
-      this.boards[k] = [];
-      this.moves_on_board[k]  = 0;
+      // Create empty 9 x (3 x 3) array
+      for (k = 0; k < 9; k++) {
+        this.boards[k] = [];
+        this.moves_on_board[k]  = 0;
 
-      for (j = 0; j < 3; j++) {
-        this.boards[k][j] = ['a' + j, 'b' + (j + 1), 'c' + (j + 2)];
+        for (j = 0; j < 3; j++) {
+          this.boards[k][j] = ['a' + j, 'b' + (j + 1), 'c' + (j + 2)];
+        }
       }
     }
+
   }
 
   /**
@@ -55,6 +63,9 @@ module.exports = (function () {
    */
   Board.prototype.make_move = function (b, r, c, o) {
     var board = this.boards[b];
+    if (!board) {
+      console.log('h');
+    } else {
 
     if (board[r][c] === 'o' || board[r][c] === 'x') {
       return false;
@@ -65,6 +76,7 @@ module.exports = (function () {
 
       return true;
     }
+  }
   }
 
   /**
@@ -77,6 +89,10 @@ module.exports = (function () {
    */
   Board.prototype.won_board = function (b) {
     var board = this.boards[b];
+
+    // Mini board is already won
+    if (this.major_board[b] === 'o' || this.major_board[b] === 'x')
+      return this.major_board[b];
 
     for (j = 0; j < 3; j++) {
       // Check row j
