@@ -22,11 +22,11 @@ module.exports = (function () {
       this.mini_wins = 0;
 
       // Create empty 9 x (3 x 3) array
-      for (k = 0; k < 9; k++) {
+      for (var k = 0; k < 9; k++) {
         this.boards[k] = [];
         this.moves_on_board[k]  = 0;
 
-        for (j = 0; j < 3; j++) {
+        for (var j = 0; j < 3; j++) {
           this.boards[k][j] = ['a' + j, 'b' + (j + 1), 'c' + (j + 2)];
         }
       }
@@ -94,7 +94,7 @@ module.exports = (function () {
     if (this.major_board[b] === 'o' || this.major_board[b] === 'x' || this.major_board[b] === 'tie')
       return this.major_board[b];
 
-    for (j = 0; j < 3; j++) {
+    for (var j = 0; j < 3; j++) {
       // Check row j
       if ((board[j][0] === board[j][1]) && (board[j][1] === board[j][2])) {
         this.mini_wins++;
@@ -136,7 +136,7 @@ module.exports = (function () {
   Board.prototype.won_game = function () {
     var major = this.major_board;
 
-    for (j = 0; j < 3; j++) {
+    for (var j = 0; j < 3; j++) {
 
       // Check row j
       if ((major[j * 3] === major[j * 3 + 1]) && (major[j * 3] === major[j * 3 + 2])) {

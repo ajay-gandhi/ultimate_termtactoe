@@ -5,6 +5,7 @@
  * The command line activation for the game
  */
 var program  = require('commander'),
+    ip       = require('ip'),
     IO       = require('socket.io'),
     IOClient = require('socket.io-client');
 
@@ -21,9 +22,8 @@ program
 if (program.multiplayer) {
   // Create a socket.io server, wait for connection from someone before starting
   // game. Port is random between 55000 and 56000
-  var host   = '127.0.0.1',
-      // port   = Math.floor(Math.random() * (56000 - 55000)) + 55000,
-      port   = 55001,
+  var host   = ip.address(),
+      port   = Math.floor(Math.random() * (56000 - 55000)) + 55000,
       socket = new IO(port);
 
   console.log('Waiting for player 2 on ' + host + ':' + port);
